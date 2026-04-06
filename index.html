@@ -6,7 +6,8 @@
     </div>
 
     <div class="wc-times">
-      Traditional Worship 9:30am • Contemporary Worship 10:30am
+      <span>Traditional Worship — 9:30am</span>
+      <span>Contemporary Worship — 10:30am</span>
     </div>
 
     <a id="wc-live-button"
@@ -60,6 +61,7 @@ html, body{
   display:flex;
   align-items:center;
   justify-content:center;
+  box-sizing:border-box;
 }
 
 #vumc-worship-countdown{
@@ -69,6 +71,7 @@ html, body{
   border-radius:16px;
   background:rgba(0,0,0,0.45);
   backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   box-shadow:0 20px 50px rgba(0,0,0,.4);
 }
 
@@ -77,6 +80,7 @@ html, body{
   color:#ffffff;
   font-weight:700;
   margin-bottom:6px;
+  text-shadow:0 2px 6px rgba(0,0,0,.55);
 }
 
 .wc-times{
@@ -85,6 +89,15 @@ html, body{
   opacity:.92;
   margin-bottom:14px;
   line-height:1.4;
+  text-shadow:0 2px 6px rgba(0,0,0,.5);
+}
+
+.wc-times span{
+  display:inline;
+}
+
+.wc-times span + span::before{
+  content:" • ";
 }
 
 .wc-timer{
@@ -96,7 +109,7 @@ html, body{
 
 .wc-box{
   background:#ffffff;
-  color:#000;
+  color:#000000;
   min-width:70px;
   padding:10px 8px;
   border-radius:10px;
@@ -104,14 +117,16 @@ html, body{
 }
 
 .wc-box span{
+  display:block;
   font-size:26px;
   font-weight:900;
-  display:block;
+  line-height:1.05;
 }
 
 .wc-box small{
   font-size:10px;
   font-weight:700;
+  letter-spacing:.5px;
 }
 
 .wc-live-btn{
@@ -119,7 +134,7 @@ html, body{
   align-items:center;
   gap:10px;
   background:#ffffff;
-  color:#000;
+  color:#000000;
   padding:12px 22px;
   border-radius:999px;
   text-decoration:none;
@@ -141,7 +156,7 @@ html, body{
 .wc-visit-btn{
   display:inline-block;
   background:#d4af37;
-  color:#000;
+  color:#000000;
   padding:12px 26px;
   border-radius:999px;
   text-decoration:none;
@@ -155,16 +170,15 @@ html, body{
   100%{transform:scale(1);}
 }
 
-/* MOBILE: remove countdown, keep times + buttons */
+/* Mobile: no countdown, bigger stacked service times */
 @media (max-width:600px){
   #vumc-worship-wrapper{
     padding:12px;
-    box-sizing:border-box;
   }
 
   #vumc-worship-countdown{
     width:100%;
-    max-width:340px;
+    max-width:360px;
     padding:16px 14px;
     border-radius:14px;
   }
@@ -174,8 +188,18 @@ html, body{
   }
 
   .wc-times{
-    font-size:13px;
-    margin-bottom:12px;
+    font-size:16px;
+    line-height:1.6;
+    margin-bottom:14px;
+  }
+
+  .wc-times span{
+    display:block;
+    font-weight:700;
+  }
+
+  .wc-times span + span::before{
+    content:"";
   }
 
   .wc-timer{
@@ -196,120 +220,128 @@ html, body{
 </style>
 
 <script>
-(function(){
+(function () {
+  const TZ = "America/New_York";
 
-const TZ="America/New_York";
+  const dEl = document.getElementById("wc-days");
+  const hEl = document.getElementById("wc-hours");
+  const mEl = document.getElementById("wc-minutes");
+  const sEl = document.getElementById("wc-seconds");
 
-const dEl=document.getElementById("wc-days");
-const hEl=document.getElementById("wc-hours");
-const mEl=document.getElementById("wc-minutes");
-const sEl=document.getElementById("wc-seconds");
+  const labelEl = document.getElementById("wc-service-label");
+  const timerEl = document.getElementById("wc-timer");
+  const liveBtn = document.getElementById("wc-live-button");
 
-const labelEl=document.getElementById("wc-service-label");
-const timerEl=document.getElementById("wc-timer");
-const liveBtn=document.getElementById("wc-live-button");
+  function parts(date){
+    const p = new Intl.DateTimeFormat("en-US", {
+      timeZone: TZ,
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: false,
+      weekday: "short"
+    }).formatToParts(date);
 
-function parts(date){
-  const p=new Intl.DateTimeFormat("en-US",{
-    timeZone:TZ,
-    year:"numeric",
-    month:"numeric",
-    day:"numeric",
-    hour:"numeric",
-    minute:"numeric",
-    second:"numeric",
-    hour12:false,
-    weekday:"short"
-  }).formatToParts(date);
+    const m = {};
+    p.forEach(x => {
+      if (x.type !== "literal") m[x.type] = x.value;
+    });
 
-  const m={};
-  p.forEach(x=>{ if(x.type!=="literal") m[x.type]=x.value; });
-
-  return {
-    y:+m.year, mo:+m.month, d:+m.day,
-    h:+m.hour, mi:+m.minute, s:+m.second,
-    w:m.weekday
-  };
-}
-
-function zonedUTC(y,mo,d,h,mi,s){
-  const guess=new Date(Date.UTC(y,mo-1,d,h,mi,s));
-  const z=parts(guess);
-  const shown=Date.UTC(z.y,z.mo-1,z.d,z.h,z.mi,z.s);
-  const want=Date.UTC(y,mo-1,d,h,mi,s);
-  return new Date(guess.getTime()+(want-shown));
-}
-
-function addDays(y,mo,d,a){
-  const dt=new Date(Date.UTC(y,mo-1,d+a));
-  return {y:dt.getUTCFullYear(), mo:dt.getUTCMonth()+1, d:dt.getUTCDate()};
-}
-
-function state(){
-  const now=new Date();
-  const z=parts(now);
-  const mins=z.h*60+z.mi;
-  const s1=570;   // 9:30
-  const s2=630;   // 10:30
-  const reset=720; // 12:00
-
-  if(z.w==="Sun"){
-    if(mins<s1){
-      return {mode:"count", target:zonedUTC(z.y,z.mo,z.d,9,30,0)};
-    }
-
-    if(mins>=s1 && mins<s2){
-      return {mode:"live", label:"Traditional Worship is live now"};
-    }
-
-    if(mins>=s2 && mins<reset){
-      return {mode:"live", label:"Contemporary Worship is live now"};
-    }
-
-    if(mins>=reset){
-      const ns=addDays(z.y,z.mo,z.d,7);
-      return {mode:"count", target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
-    }
+    return {
+      y: +m.year,
+      mo: +m.month,
+      d: +m.day,
+      h: +m.hour,
+      mi: +m.minute,
+      s: +m.second,
+      w: m.weekday
+    };
   }
 
-  const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
-  let days=(7-map[z.w])%7;
-  if(days===0) days=7;
-  const ns=addDays(z.y,z.mo,z.d,days);
-
-  return {mode:"count", target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
-}
-
-function tick(){
-  const st=state();
-
-  if(st.mode==="live"){
-    labelEl.textContent=st.label;
-    timerEl.style.display="none";
-    liveBtn.style.display="inline-flex";
-    return;
+  function zonedUTC(y, mo, d, h, mi, s){
+    const guess = new Date(Date.UTC(y, mo - 1, d, h, mi, s));
+    const z = parts(guess);
+    const shown = Date.UTC(z.y, z.mo - 1, z.d, z.h, z.mi, z.s);
+    const want = Date.UTC(y, mo - 1, d, h, mi, s);
+    return new Date(guess.getTime() + (want - shown));
   }
 
-  labelEl.textContent="Next Service Begins In";
-  liveBtn.style.display="none";
-  timerEl.style.display="flex";
+  function addDays(y, mo, d, a){
+    const dt = new Date(Date.UTC(y, mo - 1, d + a));
+    return {
+      y: dt.getUTCFullYear(),
+      mo: dt.getUTCMonth() + 1,
+      d: dt.getUTCDate()
+    };
+  }
 
-  const diff=st.target-new Date();
-  const total=Math.max(0,Math.floor(diff/1000));
+  function state(){
+    const now = new Date();
+    const z = parts(now);
+    const mins = z.h * 60 + z.mi;
+    const s1 = 570;   // 9:30
+    const s2 = 630;   // 10:30
+    const reset = 720; // 12:00
 
-  const d=Math.floor(total/86400);
-  const h=Math.floor((total%86400)/3600);
-  const m=Math.floor((total%3600)/60);
-  const s=total%60;
+    if (z.w === "Sun") {
+      if (mins < s1) {
+        return { mode: "count", target: zonedUTC(z.y, z.mo, z.d, 9, 30, 0) };
+      }
 
-  dEl.textContent=d;
-  hEl.textContent=String(h).padStart(2,"0");
-  mEl.textContent=String(m).padStart(2,"0");
-  sEl.textContent=String(s).padStart(2,"0");
-}
+      if (mins >= s1 && mins < s2) {
+        return { mode: "live", label: "Traditional Worship is live now" };
+      }
 
-tick();
-setInterval(tick,1000);
+      if (mins >= s2 && mins < reset) {
+        return { mode: "live", label: "Contemporary Worship is live now" };
+      }
 
+      if (mins >= reset) {
+        const ns = addDays(z.y, z.mo, z.d, 7);
+        return { mode: "count", target: zonedUTC(ns.y, ns.mo, ns.d, 9, 30, 0) };
+      }
+    }
+
+    const map = {Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6};
+    let days = (7 - map[z.w]) % 7;
+    if (days === 0) days = 7;
+
+    const ns = addDays(z.y, z.mo, z.d, days);
+    return { mode: "count", target: zonedUTC(ns.y, ns.mo, ns.d, 9, 30, 0) };
+  }
+
+  function tick(){
+    const st = state();
+
+    if (st.mode === "live") {
+      labelEl.textContent = st.label;
+      timerEl.style.display = "none";
+      liveBtn.style.display = "inline-flex";
+      return;
+    }
+
+    labelEl.textContent = "Next Service Begins In";
+    liveBtn.style.display = "none";
+    timerEl.style.display = "flex";
+
+    const diff = st.target - new Date();
+    const total = Math.max(0, Math.floor(diff / 1000));
+
+    const d = Math.floor(total / 86400);
+    const h = Math.floor((total % 86400) / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+
+    dEl.textContent = d;
+    hEl.textContent = String(h).padStart(2, "0");
+    mEl.textContent = String(m).padStart(2, "0");
+    sEl.textContent = String(s).padStart(2, "0");
+  }
+
+  tick();
+  setInterval(tick, 1000);
 })();
 </script>
