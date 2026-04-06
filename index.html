@@ -1,81 +1,94 @@
-<div id="vumc-worship-countdown">
+<div id="vumc-worship-wrapper">
+  <div id="vumc-worship-countdown">
 
-  <div class="wc-service" id="wc-service-label">
-    Next Service Begins In
+    <div class="wc-service" id="wc-service-label">
+      Next Service Begins In
+    </div>
+
+    <div class="wc-times">
+      Traditional Worship 9:30am • Contemporary Worship 10:30am
+    </div>
+
+    <!-- LIVE BUTTON -->
+    <a id="wc-live-button"
+       class="wc-live-btn"
+       href="https://live.versaillesumc.org"
+       target="_blank"
+       rel="noopener"
+       style="display:none;">
+       <span class="wc-live-dot"></span>
+       LIVE — WATCH NOW
+    </a>
+
+    <!-- COUNTDOWN -->
+    <div class="wc-timer" id="wc-timer">
+      <div class="wc-box">
+        <span id="wc-days">0</span>
+        <small>DAYS</small>
+      </div>
+      <div class="wc-box">
+        <span id="wc-hours">0</span>
+        <small>HOURS</small>
+      </div>
+      <div class="wc-box">
+        <span id="wc-minutes">0</span>
+        <small>MINUTES</small>
+      </div>
+      <div class="wc-box">
+        <span id="wc-seconds">0</span>
+        <small>SECONDS</small>
+      </div>
+    </div>
+
+    <!-- PLAN VISIT -->
+    <a class="wc-visit-btn"
+       href="https://www.versaillesumc.org/plan-your-visit"
+       target="_blank"
+       rel="noopener">
+       PLAN YOUR VISIT
+    </a>
+
   </div>
-
-  <!-- SERVICE TIMES -->
-  <div class="wc-times">
-    Traditional Worship 9:30am<br>
-    Contemporary Worship 10:30am
-  </div>
-
-  <!-- LIVE BUTTON -->
-  <a id="wc-live-button"
-     class="wc-live-btn"
-     href="https://live.versaillesumc.org"
-     target="_blank"
-     rel="noopener"
-     style="display:none;">
-     <span class="wc-live-dot"></span>
-     LIVE — WATCH NOW
-  </a>
-
-  <!-- COUNTDOWN -->
-  <div class="wc-timer" id="wc-timer">
-    <div class="wc-box">
-      <span id="wc-days">0</span>
-      <small>DAYS</small>
-    </div>
-    <div class="wc-box">
-      <span id="wc-hours">0</span>
-      <small>HOURS</small>
-    </div>
-    <div class="wc-box">
-      <span id="wc-minutes">0</span>
-      <small>MINUTES</small>
-    </div>
-    <div class="wc-box">
-      <span id="wc-seconds">0</span>
-      <small>SECONDS</small>
-    </div>
-  </div>
-
-  <!-- PLAN YOUR VISIT -->
-  <a class="wc-visit-btn"
-     href="https://www.versaillesumc.org/plan-your-visit"
-     target="_blank"
-     rel="noopener">
-     PLAN YOUR VISIT
-  </a>
-
 </div>
 
 <style>
-#vumc-worship-countdown{
+
+/* FULL HEIGHT CENTERING */
+#vumc-worship-wrapper{
   width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* GLASS PANEL */
+#vumc-worship-countdown{
   text-align:center;
   font-family:Arial, Helvetica, sans-serif;
-  padding:6px 0 10px;
+  padding:20px 30px;
+  border-radius:16px;
+
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(8px);
+
+  box-shadow:0 20px 50px rgba(0,0,0,.4);
 }
 
-/* MAIN LABEL */
+/* LABEL */
 .wc-service{
-  font-size:18px;
+  font-size:20px;
   color:#ffffff;
-  text-shadow:0 2px 6px rgba(0,0,0,.65);
-  margin-bottom:6px;
   font-weight:700;
+  margin-bottom:6px;
 }
 
-/* SERVICE TIMES */
+/* TIMES */
 .wc-times{
   font-size:14px;
   color:#ffffff;
   opacity:.9;
-  text-shadow:0 2px 6px rgba(0,0,0,.6);
-  margin-bottom:12px;
-  line-height:1.4;
+  margin-bottom:14px;
 }
 
 /* TIMER */
@@ -83,12 +96,12 @@
   display:flex;
   justify-content:center;
   gap:10px;
-  margin-bottom:12px;
+  margin-bottom:14px;
 }
 
 .wc-box{
   background:#ffffff;
-  color:#000000;
+  color:#000;
   min-width:70px;
   padding:10px 8px;
   border-radius:10px;
@@ -96,15 +109,13 @@
 }
 
 .wc-box span{
-  display:block;
   font-size:26px;
   font-weight:900;
-  margin-bottom:2px;
+  display:block;
 }
 
 .wc-box small{
   font-size:10px;
-  letter-spacing:.5px;
   font-weight:700;
 }
 
@@ -114,24 +125,22 @@
   align-items:center;
   gap:10px;
   background:#ffffff;
-  color:#000000;
+  color:#000;
   padding:12px 22px;
   border-radius:999px;
   text-decoration:none;
-  font-size:18px;
   font-weight:900;
   border:2px solid #d4af37;
   box-shadow:0 8px 20px rgba(0,0,0,.3);
-  animation:livePulse 1.6s infinite ease-in-out;
+  animation:pulse 1.6s infinite;
   margin-bottom:12px;
 }
 
 .wc-live-dot{
   width:10px;
   height:10px;
-  border-radius:50%;
   background:#d60000;
-  box-shadow:0 0 8px rgba(255,0,0,.7);
+  border-radius:50%;
 }
 
 /* VISIT BUTTON */
@@ -142,31 +151,30 @@
   padding:12px 26px;
   border-radius:999px;
   text-decoration:none;
-  font-size:16px;
   font-weight:900;
-  letter-spacing:.5px;
   box-shadow:0 6px 16px rgba(0,0,0,.3);
-  transition:all .2s ease;
-}
-
-.wc-visit-btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 10px 22px rgba(0,0,0,.35);
 }
 
 /* ANIMATION */
-@keyframes livePulse{
+@keyframes pulse{
   0%{transform:scale(1);}
   50%{transform:scale(1.04);}
   100%{transform:scale(1);}
 }
 
+/* REMOVE PAGE SPACING */
+body, html{
+  margin:0;
+  padding:0;
+}
+
 /* MOBILE HIDE */
 @media (max-width:600px){
-  #vumc-worship-countdown{
+  #vumc-worship-wrapper{
     display:none !important;
   }
 }
+
 </style>
 
 <script>
