@@ -4,6 +4,7 @@
     Next Service Begins In
   </div>
 
+  <!-- LIVE BUTTON -->
   <a id="wc-live-button"
      class="wc-live-btn"
      href="https://live.versaillesumc.org"
@@ -14,6 +15,7 @@
      LIVE — WATCH NOW
   </a>
 
+  <!-- COUNTDOWN -->
   <div class="wc-timer" id="wc-timer">
     <div class="wc-box">
       <span id="wc-days">0</span>
@@ -33,6 +35,14 @@
     </div>
   </div>
 
+  <!-- PLAN YOUR VISIT BUTTON -->
+  <a class="wc-visit-btn"
+     href="https://www.versaillesumc.org/plan-your-visit"
+     target="_blank"
+     rel="noopener">
+     PLAN YOUR VISIT
+  </a>
+
 </div>
 
 <style>
@@ -40,75 +50,102 @@
   width:100%;
   text-align:center;
   font-family:Arial, Helvetica, sans-serif;
-  padding:6px 0 8px;
+  padding:6px 0 10px;
 }
 
+/* SUBTITLE */
 .wc-service{
-  font-size:20px;
+  font-size:18px;
   color:#ffffff;
   text-shadow:0 2px 6px rgba(0,0,0,.65);
-  margin-bottom:14px;
+  margin-bottom:12px;
   font-weight:700;
 }
 
+/* TIMER */
 .wc-timer{
   display:flex;
   justify-content:center;
-  gap:14px;
+  gap:10px;
+  margin-bottom:12px;
 }
 
 .wc-box{
   background:#ffffff;
   color:#000000;
-  min-width:110px;
-  padding:18px 14px;
-  border-radius:14px;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
+  min-width:70px;
+  padding:10px 8px;
+  border-radius:10px;
+  box-shadow:0 6px 14px rgba(0,0,0,.25);
 }
 
 .wc-box span{
   display:block;
-  font-size:44px;
+  font-size:26px;
   font-weight:900;
-  margin-bottom:6px;
+  margin-bottom:2px;
 }
 
 .wc-box small{
-  font-size:13px;
-  letter-spacing:1px;
+  font-size:10px;
+  letter-spacing:.5px;
   font-weight:700;
 }
 
+/* LIVE BUTTON */
 .wc-live-btn{
   display:inline-flex;
   align-items:center;
   gap:10px;
   background:#ffffff;
   color:#000000;
-  padding:14px 28px;
+  padding:12px 22px;
   border-radius:999px;
   text-decoration:none;
-  font-size:20px;
+  font-size:18px;
   font-weight:900;
   border:2px solid #d4af37;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
+  box-shadow:0 8px 20px rgba(0,0,0,.3);
   animation:livePulse 1.6s infinite ease-in-out;
+  margin-bottom:12px;
 }
 
 .wc-live-dot{
-  width:12px;
-  height:12px;
+  width:10px;
+  height:10px;
   border-radius:50%;
   background:#d60000;
-  box-shadow:0 0 10px rgba(255,0,0,.7);
+  box-shadow:0 0 8px rgba(255,0,0,.7);
 }
 
+/* PLAN YOUR VISIT BUTTON */
+.wc-visit-btn{
+  display:inline-block;
+  background:#d4af37;
+  color:#000;
+  padding:12px 26px;
+  border-radius:999px;
+  text-decoration:none;
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:.5px;
+  box-shadow:0 6px 16px rgba(0,0,0,.3);
+  transition:all .2s ease;
+}
+
+.wc-visit-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 22px rgba(0,0,0,.35);
+}
+
+/* LIVE ANIMATION */
 @keyframes livePulse{
   0%{transform:scale(1);}
   50%{transform:scale(1.04);}
   100%{transform:scale(1);}
 }
 
+/* HIDE ON MOBILE */
 @media (max-width:600px){
   #vumc-worship-countdown{
     display:none !important;
@@ -177,7 +214,7 @@ return{mode:"count",target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
 }
 }
 
-const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4, Fri:5,Sat:6};
 let days=(7-map[z.w])%7;
 if(days===0) days=7;
 const ns=addDays(z.y,z.mo,z.d,days);
