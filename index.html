@@ -38,10 +38,6 @@
       </div>
     </div>
 
-    <div class="wc-mobile-countdown" id="wc-mobile-countdown" style="display:none;">
-      <span id="wc-mobile-text">0d 00h 00m 00s</span>
-    </div>
-
     <a class="wc-visit-btn"
        href="https://www.versaillesumc.org/plan-your-visit"
        target="_blank"
@@ -86,8 +82,9 @@ html, body{
 .wc-times{
   font-size:14px;
   color:#ffffff;
-  opacity:.9;
+  opacity:.92;
   margin-bottom:14px;
+  line-height:1.4;
 }
 
 .wc-timer{
@@ -117,14 +114,6 @@ html, body{
   font-weight:700;
 }
 
-.wc-mobile-countdown{
-  margin-bottom:14px;
-  color:#ffffff;
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:.5px;
-}
-
 .wc-live-btn{
   display:inline-flex;
   align-items:center;
@@ -146,6 +135,7 @@ html, body{
   height:10px;
   background:#d60000;
   border-radius:50%;
+  box-shadow:0 0 8px rgba(255,0,0,.7);
 }
 
 .wc-visit-btn{
@@ -165,11 +155,9 @@ html, body{
   100%{transform:scale(1);}
 }
 
-/* MOBILE VERSION */
+/* MOBILE: remove countdown, keep times + buttons */
 @media (max-width:600px){
   #vumc-worship-wrapper{
-    align-items:center;
-    justify-content:center;
     padding:12px;
     box-sizing:border-box;
   }
@@ -182,13 +170,11 @@ html, body{
   }
 
   .wc-service{
-    font-size:18px;
-    margin-bottom:6px;
+    display:none;
   }
 
   .wc-times{
-    font-size:12px;
-    line-height:1.4;
+    font-size:13px;
     margin-bottom:12px;
   }
 
@@ -196,19 +182,15 @@ html, body{
     display:none !important;
   }
 
-  .wc-mobile-countdown{
-    display:block !important;
-  }
-
   .wc-live-btn{
-    font-size:16px;
-    padding:11px 18px;
-    margin-bottom:12px;
+    font-size:15px;
+    padding:10px 18px;
+    margin-bottom:10px;
   }
 
   .wc-visit-btn{
     font-size:14px;
-    padding:11px 20px;
+    padding:10px 20px;
   }
 }
 </style>
@@ -222,7 +204,6 @@ const dEl=document.getElementById("wc-days");
 const hEl=document.getElementById("wc-hours");
 const mEl=document.getElementById("wc-minutes");
 const sEl=document.getElementById("wc-seconds");
-const mobileTextEl=document.getElementById("wc-mobile-text");
 
 const labelEl=document.getElementById("wc-service-label");
 const timerEl=document.getElementById("wc-timer");
@@ -268,9 +249,9 @@ function state(){
   const now=new Date();
   const z=parts(now);
   const mins=z.h*60+z.mi;
-  const s1=570;
-  const s2=630;
-  const reset=720;
+  const s1=570;   // 9:30
+  const s2=630;   // 10:30
+  const reset=720; // 12:00
 
   if(z.w==="Sun"){
     if(mins<s1){
@@ -306,12 +287,12 @@ function tick(){
     labelEl.textContent=st.label;
     timerEl.style.display="none";
     liveBtn.style.display="inline-flex";
-    document.getElementById("wc-mobile-countdown").style.display="none";
     return;
   }
 
   labelEl.textContent="Next Service Begins In";
   liveBtn.style.display="none";
+  timerEl.style.display="flex";
 
   const diff=st.target-new Date();
   const total=Math.max(0,Math.floor(diff/1000));
@@ -325,12 +306,6 @@ function tick(){
   hEl.textContent=String(h).padStart(2,"0");
   mEl.textContent=String(m).padStart(2,"0");
   sEl.textContent=String(s).padStart(2,"0");
-
-  mobileTextEl.textContent =
-    d + "d " +
-    String(h).padStart(2,"0") + "h " +
-    String(m).padStart(2,"0") + "m " +
-    String(s).padStart(2,"0") + "s";
 }
 
 tick();
