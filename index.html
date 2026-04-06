@@ -9,7 +9,6 @@
       Traditional Worship 9:30am • Contemporary Worship 10:30am
     </div>
 
-    <!-- LIVE BUTTON -->
     <a id="wc-live-button"
        class="wc-live-btn"
        href="https://live.versaillesumc.org"
@@ -20,7 +19,6 @@
        LIVE — WATCH NOW
     </a>
 
-    <!-- COUNTDOWN -->
     <div class="wc-timer" id="wc-timer">
       <div class="wc-box">
         <span id="wc-days">0</span>
@@ -40,7 +38,10 @@
       </div>
     </div>
 
-    <!-- PLAN VISIT -->
+    <div class="wc-mobile-countdown" id="wc-mobile-countdown" style="display:none;">
+      <span id="wc-mobile-text">0d 00h 00m 00s</span>
+    </div>
+
     <a class="wc-visit-btn"
        href="https://www.versaillesumc.org/plan-your-visit"
        target="_blank"
@@ -52,8 +53,11 @@
 </div>
 
 <style>
+html, body{
+  margin:0;
+  padding:0;
+}
 
-/* FULL HEIGHT CENTERING */
 #vumc-worship-wrapper{
   width:100%;
   height:100%;
@@ -62,20 +66,16 @@
   justify-content:center;
 }
 
-/* GLASS PANEL */
 #vumc-worship-countdown{
   text-align:center;
   font-family:Arial, Helvetica, sans-serif;
   padding:20px 30px;
   border-radius:16px;
-
   background:rgba(0,0,0,0.45);
   backdrop-filter:blur(8px);
-
   box-shadow:0 20px 50px rgba(0,0,0,.4);
 }
 
-/* LABEL */
 .wc-service{
   font-size:20px;
   color:#ffffff;
@@ -83,7 +83,6 @@
   margin-bottom:6px;
 }
 
-/* TIMES */
 .wc-times{
   font-size:14px;
   color:#ffffff;
@@ -91,7 +90,6 @@
   margin-bottom:14px;
 }
 
-/* TIMER */
 .wc-timer{
   display:flex;
   justify-content:center;
@@ -119,7 +117,14 @@
   font-weight:700;
 }
 
-/* LIVE BUTTON */
+.wc-mobile-countdown{
+  margin-bottom:14px;
+  color:#ffffff;
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+
 .wc-live-btn{
   display:inline-flex;
   align-items:center;
@@ -143,7 +148,6 @@
   border-radius:50%;
 }
 
-/* VISIT BUTTON */
 .wc-visit-btn{
   display:inline-block;
   background:#d4af37;
@@ -155,26 +159,58 @@
   box-shadow:0 6px 16px rgba(0,0,0,.3);
 }
 
-/* ANIMATION */
 @keyframes pulse{
   0%{transform:scale(1);}
   50%{transform:scale(1.04);}
   100%{transform:scale(1);}
 }
 
-/* REMOVE PAGE SPACING */
-body, html{
-  margin:0;
-  padding:0;
-}
-
-/* MOBILE HIDE */
+/* MOBILE VERSION */
 @media (max-width:600px){
   #vumc-worship-wrapper{
+    align-items:center;
+    justify-content:center;
+    padding:12px;
+    box-sizing:border-box;
+  }
+
+  #vumc-worship-countdown{
+    width:100%;
+    max-width:340px;
+    padding:16px 14px;
+    border-radius:14px;
+  }
+
+  .wc-service{
+    font-size:18px;
+    margin-bottom:6px;
+  }
+
+  .wc-times{
+    font-size:12px;
+    line-height:1.4;
+    margin-bottom:12px;
+  }
+
+  .wc-timer{
     display:none !important;
   }
-}
 
+  .wc-mobile-countdown{
+    display:block !important;
+  }
+
+  .wc-live-btn{
+    font-size:16px;
+    padding:11px 18px;
+    margin-bottom:12px;
+  }
+
+  .wc-visit-btn{
+    font-size:14px;
+    padding:11px 20px;
+  }
+}
 </style>
 
 <script>
@@ -186,87 +222,115 @@ const dEl=document.getElementById("wc-days");
 const hEl=document.getElementById("wc-hours");
 const mEl=document.getElementById("wc-minutes");
 const sEl=document.getElementById("wc-seconds");
+const mobileTextEl=document.getElementById("wc-mobile-text");
 
 const labelEl=document.getElementById("wc-service-label");
 const timerEl=document.getElementById("wc-timer");
 const liveBtn=document.getElementById("wc-live-button");
 
 function parts(date){
-const p=new Intl.DateTimeFormat("en-US",{timeZone:TZ,year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric",hour12:false,weekday:"short"}).formatToParts(date);
-const m={};p.forEach(x=>{if(x.type!=="literal")m[x.type]=x.value});
-return{y:+m.year,mo:+m.month,d:+m.day,h:+m.hour,mi:+m.minute,s:+m.second,w:m.weekday};
+  const p=new Intl.DateTimeFormat("en-US",{
+    timeZone:TZ,
+    year:"numeric",
+    month:"numeric",
+    day:"numeric",
+    hour:"numeric",
+    minute:"numeric",
+    second:"numeric",
+    hour12:false,
+    weekday:"short"
+  }).formatToParts(date);
+
+  const m={};
+  p.forEach(x=>{ if(x.type!=="literal") m[x.type]=x.value; });
+
+  return {
+    y:+m.year, mo:+m.month, d:+m.day,
+    h:+m.hour, mi:+m.minute, s:+m.second,
+    w:m.weekday
+  };
 }
 
 function zonedUTC(y,mo,d,h,mi,s){
-const guess=new Date(Date.UTC(y,mo-1,d,h,mi,s));
-const z=parts(guess);
-const shown=Date.UTC(z.y,z.mo-1,z.d,z.h,z.mi,z.s);
-const want=Date.UTC(y,mo-1,d,h,mi,s);
-return new Date(guess.getTime()+(want-shown));
+  const guess=new Date(Date.UTC(y,mo-1,d,h,mi,s));
+  const z=parts(guess);
+  const shown=Date.UTC(z.y,z.mo-1,z.d,z.h,z.mi,z.s);
+  const want=Date.UTC(y,mo-1,d,h,mi,s);
+  return new Date(guess.getTime()+(want-shown));
 }
 
 function addDays(y,mo,d,a){
-const dt=new Date(Date.UTC(y,mo-1,d+a));
-return{y:dt.getUTCFullYear(),mo:dt.getUTCMonth()+1,d:dt.getUTCDate()};
+  const dt=new Date(Date.UTC(y,mo-1,d+a));
+  return {y:dt.getUTCFullYear(), mo:dt.getUTCMonth()+1, d:dt.getUTCDate()};
 }
 
 function state(){
-const now=new Date();
-const z=parts(now);
-const mins=z.h*60+z.mi;
-const s1=570;
-const s2=630;
-const reset=720;
+  const now=new Date();
+  const z=parts(now);
+  const mins=z.h*60+z.mi;
+  const s1=570;
+  const s2=630;
+  const reset=720;
 
-if(z.w==="Sun"){
+  if(z.w==="Sun"){
+    if(mins<s1){
+      return {mode:"count", target:zonedUTC(z.y,z.mo,z.d,9,30,0)};
+    }
 
-if(mins<s1){
-return{mode:"count",target:zonedUTC(z.y,z.mo,z.d,9,30,0)};
-}
+    if(mins>=s1 && mins<s2){
+      return {mode:"live", label:"Traditional Worship is live now"};
+    }
 
-if(mins>=s1 && mins<s2){
-return{mode:"live",label:"Traditional Worship is live now"};
-}
+    if(mins>=s2 && mins<reset){
+      return {mode:"live", label:"Contemporary Worship is live now"};
+    }
 
-if(mins>=s2 && mins<reset){
-return{mode:"live",label:"Contemporary Worship is live now"};
-}
+    if(mins>=reset){
+      const ns=addDays(z.y,z.mo,z.d,7);
+      return {mode:"count", target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
+    }
+  }
 
-if(mins>=reset){
-const ns=addDays(z.y,z.mo,z.d,7);
-return{mode:"count",target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
-}
-}
+  const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+  let days=(7-map[z.w])%7;
+  if(days===0) days=7;
+  const ns=addDays(z.y,z.mo,z.d,days);
 
-const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
-let days=(7-map[z.w])%7;
-if(days===0) days=7;
-const ns=addDays(z.y,z.mo,z.d,days);
-
-return{mode:"count",target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
+  return {mode:"count", target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
 }
 
 function tick(){
-const st=state();
+  const st=state();
 
-if(st.mode==="live"){
-labelEl.textContent=st.label;
-timerEl.style.display="none";
-liveBtn.style.display="inline-flex";
-return;
-}
+  if(st.mode==="live"){
+    labelEl.textContent=st.label;
+    timerEl.style.display="none";
+    liveBtn.style.display="inline-flex";
+    document.getElementById("wc-mobile-countdown").style.display="none";
+    return;
+  }
 
-labelEl.textContent="Next Service Begins In";
-liveBtn.style.display="none";
-timerEl.style.display="flex";
+  labelEl.textContent="Next Service Begins In";
+  liveBtn.style.display="none";
 
-const diff=st.target-new Date();
-const total=Math.max(0,Math.floor(diff/1000));
+  const diff=st.target-new Date();
+  const total=Math.max(0,Math.floor(diff/1000));
 
-dEl.textContent=Math.floor(total/86400);
-hEl.textContent=String(Math.floor((total%86400)/3600)).padStart(2,"0");
-mEl.textContent=String(Math.floor((total%3600)/60)).padStart(2,"0");
-sEl.textContent=String(total%60).padStart(2,"0");
+  const d=Math.floor(total/86400);
+  const h=Math.floor((total%86400)/3600);
+  const m=Math.floor((total%3600)/60);
+  const s=total%60;
+
+  dEl.textContent=d;
+  hEl.textContent=String(h).padStart(2,"0");
+  mEl.textContent=String(m).padStart(2,"0");
+  sEl.textContent=String(s).padStart(2,"0");
+
+  mobileTextEl.textContent =
+    d + "d " +
+    String(h).padStart(2,"0") + "h " +
+    String(m).padStart(2,"0") + "m " +
+    String(s).padStart(2,"0") + "s";
 }
 
 tick();
