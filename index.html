@@ -4,6 +4,12 @@
     Next Service Begins In
   </div>
 
+  <!-- SERVICE TIMES -->
+  <div class="wc-times">
+    Traditional Worship 9:30am<br>
+    Contemporary Worship 10:30am
+  </div>
+
   <!-- LIVE BUTTON -->
   <a id="wc-live-button"
      class="wc-live-btn"
@@ -35,7 +41,7 @@
     </div>
   </div>
 
-  <!-- PLAN YOUR VISIT BUTTON -->
+  <!-- PLAN YOUR VISIT -->
   <a class="wc-visit-btn"
      href="https://www.versaillesumc.org/plan-your-visit"
      target="_blank"
@@ -53,13 +59,23 @@
   padding:6px 0 10px;
 }
 
-/* SUBTITLE */
+/* MAIN LABEL */
 .wc-service{
   font-size:18px;
   color:#ffffff;
   text-shadow:0 2px 6px rgba(0,0,0,.65);
-  margin-bottom:12px;
+  margin-bottom:6px;
   font-weight:700;
+}
+
+/* SERVICE TIMES */
+.wc-times{
+  font-size:14px;
+  color:#ffffff;
+  opacity:.9;
+  text-shadow:0 2px 6px rgba(0,0,0,.6);
+  margin-bottom:12px;
+  line-height:1.4;
 }
 
 /* TIMER */
@@ -118,7 +134,7 @@
   box-shadow:0 0 8px rgba(255,0,0,.7);
 }
 
-/* PLAN YOUR VISIT BUTTON */
+/* VISIT BUTTON */
 .wc-visit-btn{
   display:inline-block;
   background:#d4af37;
@@ -138,14 +154,14 @@
   box-shadow:0 10px 22px rgba(0,0,0,.35);
 }
 
-/* LIVE ANIMATION */
+/* ANIMATION */
 @keyframes livePulse{
   0%{transform:scale(1);}
   50%{transform:scale(1.04);}
   100%{transform:scale(1);}
 }
 
-/* HIDE ON MOBILE */
+/* MOBILE HIDE */
 @media (max-width:600px){
   #vumc-worship-countdown{
     display:none !important;
@@ -214,7 +230,7 @@ return{mode:"count",target:zonedUTC(ns.y,ns.mo,ns.d,9,30,0)};
 }
 }
 
-const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4, Fri:5,Sat:6};
+const map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
 let days=(7-map[z.w])%7;
 if(days===0) days=7;
 const ns=addDays(z.y,z.mo,z.d,days);
